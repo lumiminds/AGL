@@ -1,0 +1,33 @@
+name: Build Pipeline
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout branch
+      uses: actions/checkout@v2
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.101
+    - name: Install dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+    - name: Test
+      run: dotnet test --no-restore --verbosity normal
+    - name: Publish
+      run: dotnet publish
+    - name: Upload AGL.App Build Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: AGL.App.zip
+        path: /home/runner/work/AGL/AGL/AGL.App/bin/Debug/netcoreapp3.1/publish/
